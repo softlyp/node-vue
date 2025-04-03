@@ -8,7 +8,7 @@ import pipRoutes from "./routes/pipRoutes";
 const app = express();
 
 const corsOptions = {
-    origin: 'http://localhost:5173', 
+    origin: 'https://pipdata.web.app', // 'http://localhost:5173'
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   };
