@@ -27,6 +27,7 @@ export const register = async (req: any, res: any): Promise<void> => {
       await User.createUser({username, password: hashedPassword});
         res.status(201).json({message: 'Usuario registrado'});
     } catch (error) {
+        console.log("error registrando:"+error)
         res.status(500).json({error: 'Error al registrar'});
     }
 };
