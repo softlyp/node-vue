@@ -4,50 +4,51 @@
       h1(class="text-2xl font-semibold text-center mb-6") Iniciar Sesión
       form(@submit.prevent="login")
         div(class="mb-4")
-          input(v-model="username" placeholder="Usuario" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+          TextInput(v-model="username" placeholder="Usuario")
         div(class="mb-6")
-          input(type="password" v-model="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
-        button(type="submit"  class="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500") Iniciar sesión
+            TextInput(v-model="password" type="password" placeholder="Contraseña")
+        Btn( :loading="isLoading" :disabled="isLoading" variant="primary" type="submit") Iniciar sesión
+
 </template>
 
-<script lang="ts">
-import {inject, ref} from 'vue';
+<script setup lang="ts">
+import {inject, ref} from 'vue'
+import {useRouter} from 'vue-router'
 import {api_host} from '../config/constants'
-import {useAuthStore} from '../store/authStore';
-import {useRouter} from "vue-router";
+import {useAuthStore} from '../store/authStore'
+import TextInput from '../components/TextInput.vue'
+import Btn from '../components/Btn.vue'
 
-export default {
-  setup() {
-    const axios = inject("axios");
-    const authStore = useAuthStore(); 
-    const router = useRouter();
+const axios = inject('axios') as any
+const router = useRouter()
+const authStore = useAuthStore()
 
-    const username = ref('');
-    const password = ref('');
-    const login = async () => {
-      try {
-        if(!username.value.trim() || !password.value.trim()){
-          return;
-        }
-        const res = await axios.post(`${api_host}/auth/login`,
-            {username: username.value, password: password.value}
-        );
-        if (res.data?.token) {
-          authStore.login(res.data.token);
-          router.push('/dashboard');
-        }
-      } catch {
-        alert('Credenciales incorrectas');
-      }
+const username = ref<string>('')
+const password = ref<string>('')
+const isLoading = ref<boolean>(false)
+
+const login = async () => {
+  try {
+    if (!username.value.trim() || !password.value.trim()) {
+      return
     }
 
-    return {
-      username,
-      password,
-      login
-    };
+    isLoading.value = true
+    const res = await axios.post(`${api_host}/auth/login`, {
+      username: username.value,
+      password: password.value
+    })
+
+    if (res.data?.token) {
+      authStore.login(res.data.token)
+      router.push('/dashboard')
+    }
+  } catch {
+    alert('Credenciales incorrectas')
+  } finally {
+    setTimeout(() => {
+      isLoading.value = false
+    }, 800)
   }
-};
-
-
+}
 </script>
